@@ -23,4 +23,6 @@ Edit your name, the one-line description, or an optional email at the top of `sr
 
 ## GitHub Pages
 
-Live at GitHub Pages from the `nickvw-art` repo. New drawings go live the same way: drop them in `drawings/`, commit, push.
+Live at https://nvande.github.io/nickvw-art/
+
+To update the live site after adding drawings: `npm run build`, then replace the `gh-pages` branch with the new `dist/` folder.
