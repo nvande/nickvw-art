@@ -1,14 +1,23 @@
 # Nick
 
-A small site for graphite portraits. Drop image files into `drawings/` and they show up.
+A small site for graphite portraits.
 
 ```
 drawings/
   01-study.jpg
   02-portrait.jpg
+
+resemblance/
+  jane/
+    photo.jpg
+    drawing.jpg
+  study/
+    drawing-only.jpg
 ```
 
-Names are sorted alphabetically, so a number prefix sets the order. The filename (minus the number) is used as the image’s alt text.
+`drawings/` is the main gallery. `resemblance/` is likeness pairs: one folder per example, with two images (shown side by side) or one.
+
+Names are sorted alphabetically, so a number prefix sets the order. Edit pricing and contact copy at the top of `src/App.jsx`.
 
 Use jpg, png, or webp. Phone photos as HEIC will not display — export to jpg first. A couple thousand pixels on the long edge is plenty.
 
