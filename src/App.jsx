@@ -14,6 +14,10 @@ const CONTACT = [
   'For sittings and commissions, get in touch at t2vanden@gmail.com',
 ]
 
+const RESEMBLANCE = [
+  'I don\'t take photos until after the drawing is complete. I prefer to work from life over simply reproducing what the camera sees.',
+]
+
 const SECTIONS = ['gallery', 'resemblance', 'pricing', 'contact']
 
 const galleryFiles = import.meta.glob('../drawings/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG,WEBP,GIF}', {
@@ -134,28 +138,35 @@ export default function App() {
       )}
 
       {section === 'resemblance' && (
-        pairs.length === 0 ? (
-          <p className="empty">Drop a photo and a drawing into a folder inside resemblance.</p>
-        ) : (
-          <main className="pairs">
-            {pairs.map((pair) => (
-              <div
-                key={pair.folder}
-                className={pair.images.length === 1 ? 'pair single' : 'pair'}
-              >
-                {pair.images.map((image, i) => (
-                  <button
-                    key={image.path}
-                    type="button"
-                    onClick={() => setViewer({ list: pair.images, index: i })}
-                  >
-                    <img src={image.src} alt={`${pair.title} ${image.title}`} />
-                  </button>
-                ))}
-              </div>
+        <>
+          <section className="prose resemblance-intro">
+            {RESEMBLANCE.map((line) => (
+              <p key={line}>{line}</p>
             ))}
-          </main>
-        )
+          </section>
+          {pairs.length === 0 ? (
+            <p className="empty">Drop a photo and a drawing into a folder inside resemblance.</p>
+          ) : (
+            <main className="pairs">
+              {pairs.map((pair) => (
+                <div
+                  key={pair.folder}
+                  className={pair.images.length === 1 ? 'pair single' : 'pair'}
+                >
+                  {pair.images.map((image, i) => (
+                    <button
+                      key={image.path}
+                      type="button"
+                      onClick={() => setViewer({ list: pair.images, index: i })}
+                    >
+                      <img src={image.src} alt={`${pair.title} ${image.title}`} />
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </main>
+          )}
+        </>
       )}
 
       {section === 'pricing' && (

@@ -104,6 +104,11 @@ header p {
   margin-bottom: 0;
 }
 
+.resemblance-intro {
+  max-width: 34rem;
+  margin-bottom: 2.75rem;
+}
+
 .gallery {
   columns: 2;
   column-gap: 1.75rem;
