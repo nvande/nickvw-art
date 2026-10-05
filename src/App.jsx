@@ -4,7 +4,7 @@ const NAME = 'nick vw'
 const LINE = 'portraits from live studio sessions'
 
 const PRICING = [
-  'Portraits take 1hr to complete, and are done on 11x14 inch paper in graphite.',
+  'Portraits take 1.5hrs to complete, and are done on 11x14 inch paper in graphite.',
   'Cost is $100.',
   'I accept cash, Venmo, and PayPal.',
 ]
@@ -15,7 +15,8 @@ const CONTACT = [
 ]
 
 const RESEMBLANCE = [
-  'I don\'t take photos until after the drawing is complete. I prefer to work from life over simply reproducing what the camera sees.',
+  'I do not work from photos, I prefer to work from life over simply reproducing what the camera sees.',
+  'These photos were taken to help you see the likeness to the subject.',
 ]
 
 const SECTIONS = ['gallery', 'resemblance', 'pricing', 'contact']
@@ -26,20 +27,33 @@ const galleryFiles = import.meta.glob('../drawings/*.{jpg,jpeg,png,webp,gif,JPG,
   import: 'default',
 })
 
+const galleryThumbs = import.meta.glob('../drawings/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG,WEBP,GIF}', {
+  eager: true,
+  query: '?thumb',
+  import: 'default',
+})
+
 const pairFiles = import.meta.glob('../resemblance/*/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG,WEBP,GIF}', {
   eager: true,
   query: '?url',
   import: 'default',
 })
 
-const drawings = Object.entries(galleryFiles)
-  .map(([path, src]) => ({ src, path, title: titleFromPath(path) }))
-  .sort((a, b) => a.path.localeCompare(b.path))
+const pairThumbs = import.meta.glob('../resemblance/*/*.{jpg,jpeg,png,webp,gif,JPG,JPEG,PNG,WEBP,GIF}', {
+  eager: true,
+  query: '?thumb',
+  import: 'default',
+})
 
-const pairs = groupPairs(pairFiles)
+const drawings = withThumbs(galleryFiles, galleryThumbs).sort((a, b) => a.path.localeCompare(b.path))
+const pairs = groupPairs(withThumbs(pairFiles, pairThumbs))
+
+function cleanPath(path) {
+  return path.split('?')[0]
+}
 
 function titleFromPath(path) {
-  const file = path.split('/').pop() ?? ''
+  const file = cleanPath(path).split('/').pop() ?? ''
   return file
     .replace(/\.[^.]+$/, '')
     .replace(/[-_]+/g, ' ')
@@ -47,13 +61,42 @@ function titleFromPath(path) {
     .trim()
 }
 
-function groupPairs(files) {
+function withThumbs(full, thumbs) {
+  const thumbByPath = Object.fromEntries(
+    Object.entries(thumbs).map(([path, src]) => [cleanPath(path), src]),
+  )
+
+  return Object.entries(full).map(([path, src]) => ({
+    src,
+    thumb: thumbByPath[cleanPath(path)],
+    path: cleanPath(path),
+    title: titleFromPath(path),
+  }))
+}
+
+function Photo({ src, thumb, alt }) {
+  const [ready, setReady] = useState(false)
+
+  return (
+    <span className="photo">
+      {thumb && <img className="photo-low" src={thumb} alt="" />}
+      <img
+        className={ready ? 'photo-high ready' : 'photo-high'}
+        src={src}
+        alt={alt}
+        onLoad={() => setReady(true)}
+      />
+    </span>
+  )
+}
+
+function groupPairs(images) {
   const groups = new Map()
 
-  for (const [path, src] of Object.entries(files)) {
-    const folder = path.split('/').at(-2)
+  for (const image of images) {
+    const folder = image.path.split('/').at(-2)
     if (!groups.has(folder)) groups.set(folder, [])
-    groups.get(folder).push({ src, path, title: titleFromPath(path) })
+    groups.get(folder).push(image)
   }
 
   return [...groups.entries()]
@@ -130,7 +173,7 @@ export default function App() {
                 className="piece"
                 onClick={() => setViewer({ list: drawings, index: i })}
               >
-                <img src={drawing.src} alt={drawing.title} />
+                <Photo src={drawing.src} thumb={drawing.thumb} alt={drawing.title} />
               </button>
             ))}
           </main>
@@ -159,7 +202,7 @@ export default function App() {
                       type="button"
                       onClick={() => setViewer({ list: pair.images, index: i })}
                     >
-                      <img src={image.src} alt={`${pair.title} ${image.title}`} />
+                      <Photo src={image.src} thumb={image.thumb} alt={`${pair.title} ${image.title}`} />
                     </button>
                   ))}
                 </div>
